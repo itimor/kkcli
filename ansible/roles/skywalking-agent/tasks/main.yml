@@ -18,4 +18,4 @@
   when: check_package is failure
 
 - name: chown mode
-  shell: chown -R kkom.kkom /yl/app/skywalking-agent
+  shell: chown -R root.root /yl/app/skywalking-agent

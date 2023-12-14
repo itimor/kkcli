@@ -1,11 +1,11 @@
 ---
-- name: create kkom user if no exists
+- name: create root user if no exists
   user:
-    name: kkom
+    name: root
     state: present
-- name: create kkom group if no exists
+- name: create root group if no exists
   group:
-    name: kkom
+    name: root
     state: present
 
 - name: setup remote logs dir
@@ -13,16 +13,16 @@
     path: "/yl/logs/"
     state: directory
     mode: 0755
-    owner: kkom
-    group: kkom
+    owner: root
+    group: root
 
 - name: setup remote java dir
   file:
     path: "/yl/logs/deploy/java/{{ app_name }}"
     state: directory
     mode: 0755
-    owner: kkom
-    group: kkom
+    owner: root
+    group: root
 
 - name: copy project systemd file to remote host
   template:

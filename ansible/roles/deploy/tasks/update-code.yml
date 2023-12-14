@@ -17,14 +17,14 @@
   copy:
     content: "{{ ansistrano_release_version }}"
     dest: "{{ ansistrano_release_path.stdout }}/REVISION"
-    owner: kkom
-    group: kkom
+    owner: root
+    group: root
   when: ansistrano_git_result is not defined
 
 - name: ANSISTRANO | Copy git released version into REVISION file
   copy:
     content: "{{ ansistrano_git_result.after }}"
     dest: "{{ ansistrano_release_path.stdout }}/REVISION"
-    owner: kkom
-    group: kkom
+    owner: root
+    group: root
   when: ansistrano_git_result is defined

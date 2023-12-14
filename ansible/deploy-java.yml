@@ -7,7 +7,7 @@
     ansistrano_deploy_from: "{{ app_from }}"
     ansistrano_deploy_to: "/yl/app/{{ app_name }}"
     ansistrano_release_version: "{{ app_version }}"
-    ansistrano_keep_releases: 10
+    ansistrano_keep_releases: 5
     ansistrano_deploy_via: copy
     ansistrano_jar_name: "{{ app_jar_name }}"
     ansistrano_app_env: "{{ app_env }}"

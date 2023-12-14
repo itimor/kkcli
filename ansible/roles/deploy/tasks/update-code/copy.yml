@@ -9,5 +9,5 @@
     src: "{{ ansistrano_deploy_from }}"
     dest: "{{ ansistrano_release_path.stdout }}"
     mode: 0755
-    owner: kkom
-    group: kkom
+    owner: root
+    group: root
