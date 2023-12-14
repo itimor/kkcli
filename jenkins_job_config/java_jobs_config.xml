@@ -19,7 +19,7 @@
       <parameterDefinitions>
         <hudson.model.ChoiceParameterDefinition>
           <name>action</name>
-          <choices class="java.util.Arrays$ArrayList">
+          <choices class="java.util.Arrays$Arraoptist">
             <a class="string-array">
               <string>deploy</string>
               <string>restart</string>
@@ -84,7 +84,7 @@ if [[ $action == 'deploy' ]];then
   ## 打包
   colo_r purple "开始打包"
   cd $WORKSPACE/$src_dir
-  /yl/app/maven381/bin/mvn clean deploy -pl com.yiling:$project -am -Dmaven.test.skip=true  
+  /opt/app/maven381/bin/mvn clean deploy -pl com.yiling:$project -am -Dmaven.test.skip=true  
   from=`ls $code_dir/target/*.jar`
   if [ ! -f "${from}" ]; then
    colo_r red "jar 打包失败" 

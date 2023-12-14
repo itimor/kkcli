@@ -5,7 +5,7 @@
     dest: /usr/local/src
 
 - name: check package
-  shell: ls /yl/app/skywalking-agent
+  shell: ls /opt/app/skywalking-agent
   register: check_package
   ignore_errors: true
 
@@ -14,8 +14,8 @@
   when: check_package is failure
 
 - name: mv skywalking-agent
-  shell: mv /usr/local/src/skywalking-agent /yl/app/skywalking-agent
+  shell: mv /usr/local/src/skywalking-agent /opt/app/skywalking-agent
   when: check_package is failure
 
 - name: chown mode
-  shell: chown -R root.root /yl/app/skywalking-agent
+  shell: chown -R root.root /opt/app/skywalking-agent

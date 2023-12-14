@@ -19,7 +19,7 @@
       <parameterDefinitions>
         <hudson.model.ChoiceParameterDefinition>
           <name>action</name>
-          <choices class="java.util.Arrays$ArrayList">
+          <choices class="java.util.Arrays$Arraoptist">
             <a class="string-array">
               <string>deploy</string>
               <string>restart</string>
@@ -48,7 +48,7 @@
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <url>http://git.yl.local/service/yiling-platform.git</url>
+        <url>http://git.opt.local/service/yiling-platform.git</url>
         <credentialsId>866a0677-fee5-4ede-8a6e-487354b07531</credentialsId>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
@@ -84,7 +84,7 @@ if [[ $action == 'deploy' ]];then
   ## 打包
   colo_r purple "开始打包"
   cd $WORKSPACE/$src_dir
-  /yl/app/maven381/bin/mvn clean deploy -pl com.yiling:$project -am -Dmaven.test.skip=true  
+  /opt/app/maven381/bin/mvn clean deploy -pl com.yiling:$project -am -Dmaven.test.skip=true  
   from=`ls $code_dir/target/*.jar`
   if [ ! -f "${from}" ]; then
    colo_r red "jar 打包失败" 
@@ -138,7 +138,7 @@ fi</command>
       <colorMapName>xterm</colorMapName>
     </hudson.plugins.ansicolor.AnsiColorBuildWrapper>
   </buildWrappers>
-</project>[root@ylyyB2B003]─[/yl/data/jenkins/jobs/dev/jobs]
+</project>[root@optyyB2B003]─[/opt/data/jenkins/jobs/dev/jobs]
 [Pass]─# cat yiling-web-manage/config.xml 
 <?xml version="1.1" encoding="UTF-8" standalone="no"?><project>
   <actions/>
@@ -166,7 +166,7 @@ fi</command>
         </hudson.model.BooleanParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>action</name>
-          <choices class="java.util.Arrays$ArrayList">
+          <choices class="java.util.Arrays$Arraoptist">
             <a class="string-array">
               <string>deploy</string>
               <string>rollback</string>
@@ -194,7 +194,7 @@ fi</command>
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <url>http://git.yl.local/junchao.ma/yiling-web-manage.git</url>
+        <url>http://git.opt.local/junchao.ma/yiling-web-manage.git</url>
         <credentialsId>866a0677-fee5-4ede-8a6e-487354b07531</credentialsId>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>

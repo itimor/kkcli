@@ -3,7 +3,7 @@
 ansistrano_deploy_from: "{{ playbook_dir }}"
 
 # Path where the code must be deployed to
-ansistrano_deploy_to: "/yl/app"
+ansistrano_deploy_to: "/opt/app"
 
 # Folder name for the releases
 ansistrano_version_dir: "releases"

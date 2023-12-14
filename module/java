@@ -18,12 +18,6 @@ fi
 
 _parse_arguments "$@"
 
-if test "$env" = "prd"; then
-    nacos="nacos1.prd.yl.local:18003,nacos2.prd.yl.local:18003,nacos3.prd.yl.local:18003"
-else
-    nacos="nacos.comm.yl.local:18003"
-fi
-
 if test "$action" = "restart"; then
     _restart_default_project ${project} ${host:-local} ${env}
     sleep 10

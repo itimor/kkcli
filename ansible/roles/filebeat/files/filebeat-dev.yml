@@ -2,7 +2,7 @@ filebeat.inputs:
 - type: log 
   enabled: true
   paths:
-    - /yl/logs/deploy/java/*/*.log
+    - /opt/logs/deploy/java/*/*.log
   fields_under_root: true
   # 日志为json格式开启
   # json.keys_under_root: true

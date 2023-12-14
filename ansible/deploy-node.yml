@@ -3,7 +3,7 @@
   remote_user: root
   vars:
     ansistrano_deploy_from: "{{ app_from }}"
-    ansistrano_deploy_to: "/yl/app/{{ app_name }}"
+    ansistrano_deploy_to: "/opt/app/{{ app_name }}"
     ansistrano_release_version: "{{ app_version }}"
     ansistrano_keep_releases: 10
     ansistrano_deploy_via: rsync

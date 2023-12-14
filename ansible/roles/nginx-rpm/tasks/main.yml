@@ -16,14 +16,14 @@
 
 - name: update nginx pid file dir
   command:
-    sed -i 's#/usr/local/nginx/run/nginx.pid#/yl/logs/nginx/nginx.pid#' /usr/local/nginx/nginx.conf
+    sed -i 's#/usr/local/nginx/run/nginx.pid#/opt/logs/nginx/nginx.pid#' /usr/local/nginx/nginx.conf
 
 - name: create nginx log directory
-  file: path=/yl/logs/nginx state=directory
+  file: path=/opt/logs/nginx state=directory
 
 - name: chown nginx log mode
   command:
-    chown -R www.www /yl/logs/nginx
+    chown -R www.www /opt/logs/nginx
 
 - name:  nginx daemon-reload
   command:

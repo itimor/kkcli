@@ -10,7 +10,7 @@
 
 - name: setup remote logs dir
   file:
-    path: "/yl/logs/"
+    path: "/opt/logs/"
     state: directory
     mode: 0755
     owner: root
@@ -18,7 +18,7 @@
 
 - name: setup remote java dir
   file:
-    path: "/yl/logs/deploy/java/{{ app_name }}"
+    path: "/opt/logs/deploy/java/{{ app_name }}"
     state: directory
     mode: 0755
     owner: root
