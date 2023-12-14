@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 PKG="kkcli"
-GIT_URL="https://gitee.com/i6bu6/kkcli.git"
+GIT_URL="https://github.com/itimor/kkcli.git"
 INSTALL_DIR="${INSTALL_DIR}"
 
 has(){
