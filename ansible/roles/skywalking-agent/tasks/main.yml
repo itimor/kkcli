@@ -1,0 +1,21 @@
+---
+- name: copy jar to remote host
+  copy:
+    src: skywalking-agent.tar.gz
+    dest: /usr/local/src
+
+- name: check package
+  shell: ls /yl/app/skywalking-agent
+  register: check_package
+  ignore_errors: true
+
+- name: tar skywalking-agent.tar.gz
+  shell: chdir=/usr/local/src tar zxf skywalking-agent.tar.gz 
+  when: check_package is failure
+
+- name: mv skywalking-agent
+  shell: mv /usr/local/src/skywalking-agent /yl/app/skywalking-agent
+  when: check_package is failure
+
+- name: chown mode
+  shell: chown -R kkom.kkom /yl/app/skywalking-agent

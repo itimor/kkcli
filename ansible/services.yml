@@ -1,0 +1,42 @@
+---
+- name: create kkom user if no exists
+  user:
+    name: kkom
+    state: present
+- name: create kkom group if no exists
+  group:
+    name: kkom
+    state: present
+
+- name: setup remote logs dir
+  file:
+    path: "/yl/logs/"
+    state: directory
+    mode: 0755
+    owner: kkom
+    group: kkom
+
+- name: setup remote java dir
+  file:
+    path: "/yl/logs/deploy/java/{{ app_name }}"
+    state: directory
+    mode: 0755
+    owner: kkom
+    group: kkom
+
+- name: copy project systemd file to remote host
+  template:
+    src: "{{ app_env }}/{{ app_name }}.service.j2"
+    dest: "/usr/lib/systemd/system/{{ app_name }}.service"
+    mode: 0644
+
+- name: restart "{{ app_name }}" 
+  systemd:
+    name: "{{ app_name }}"
+    daemon_reload: yes
+    state: restarted
+    enabled: yes
+
+- name: wait for service to start
+  shell:
+    cmd: sleep 30

@@ -1,0 +1,60 @@
+---
+- name: Install jemalloc by yum
+  yum:
+    name: jemalloc,jemalloc-devel
+    state: present
+
+- name: copy nginx rpm to remote host
+  copy:
+    src: nginx-1.19.3.tar.gz
+    dest: /usr/local/src
+
+- name: check nginx
+  shell: ls /yl/app/openresty
+  register: check_nginx
+  ignore_errors: true
+
+- name: tar nginx-1.19.3.tar.gz
+  shell: chdir=/usr/local/src tar zxf nginx-1.19.3.tar.gz 
+  when: check_nginx is failure
+
+- name: mv nginx
+  shell: mv /usr/local/src/openresty /yl/app/openresty
+  when: check_nginx is failure
+
+- name: sync nginx.service configure file
+  copy:
+    src: nginx.service
+    dest: /usr/lib/systemd/system/
+
+- name: sync nginx.conf configure file
+  copy:
+    src: nginx.conf
+    dest: /yl/app/openresty/nginx/conf/nginx.conf
+  when: check_nginx is failure  
+  
+- name: create nginx vhost directory
+  file: path=/yl/app/openresty/nginx/conf/vhost state=directory
+
+- name: create nginx log directory
+  file: path=/yl/logs/nginx state=directory
+
+- name: chown nginx log mode
+  shell: useradd www -M -s /sbin/nologin && chown -R www.www /yl/logs/nginx
+  ignore_errors: true
+
+- name: soft link nginx conf
+  file: src=/yl/app/openresty/nginx/conf dest=/etc/nginx state=link
+  ignore_errors: true
+
+- name: soft link nginx bin
+  file: src=/yl/app/openresty/nginx/sbin/nginx dest=/bin/nginx state=link
+  ignore_errors: true
+
+- name:  nginx daemon-reload
+  shell: systemctl daemon-reload
+    
+- name: restart service nginx
+  service:
+    name: nginx
+    state: restarted

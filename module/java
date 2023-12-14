@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# java
+
+set -e
+
+. ${KKPATH}/lib/util.sh
+
+project=
+host=
+version=
+from=
+env=
+action=
+
+if [[ $# -eq 0 ]]; then 
+    _usage_module `basename $0` ${project} && exit 1
+fi
+
+_parse_arguments "$@"
+
+if test "$env" = "prd"; then
+    nacos="nacos1.prd.yl.local:18003,nacos2.prd.yl.local:18003,nacos3.prd.yl.local:18003"
+else
+    nacos="nacos.comm.yl.local:18003"
+fi
+
+if test "$action" = "restart"; then
+    _restart_default_project ${project} ${host:-local} ${env}
+    sleep 10
+fi
+
+if test "$action" = "deploy"; then
+
+    if [[ -z ${project} ]]; then _red "please input ${project}.jar project name" && exit 1;fi
+    if [[ -z ${from} ]]; then _red "please input ${project}.jar absolute path" && exit 1;fi
+    if [[ -z ${version} ]]; then _red "please input deploy tag or commit" && exit 1;fi
+    if [[ -z ${env} ]]; then _red "please input deploy environment" && exit 1;fi 
+
+    if [[ ! -f ${KKPATH}/ansible/roles/deploy/templates/${env}/${project}.service.j2 ]]; then
+        cp -r ${KKPATH}/ansible/roles/deploy/templates/${env}/example.service.j2 ${KKPATH}/ansible/roles/deploy/templates/${env}/${project}.service.j2
+    fi
+    # cp -r ${KKPATH}/ansible/roles/deploy/templates/${env}/example.service.j2 ${KKPATH}/ansible/roles/deploy/templates/${env}/${project}.service.j2
+    _deploy_java_project ${project} ${version} ${host:-local} ${from} `basename ${from}` ${env} ${nacos}
+
+fi
+
+if test "$action" = "rollback"; then
+    
+    if [[ -z ${env} ]]; then _red "please input deploy environment" && exit 1;fi
+
+    _rollback_default_project ${project} ${host:-local} ${env}
+    _restart_default_project ${project} ${host:-local} ${env}
+    sleep 10
+fi

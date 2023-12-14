@@ -1,0 +1,9 @@
+---
+- name: Rollback project to default version
+  hosts: "{{ app_host }}"
+  gather_facts: no
+  vars:
+    ansistrano_deploy_to: "/yl/app/{{ app_name }}"
+    ansistrano_remove_rolled_back: yes
+  roles:
+    - { role: rollback }

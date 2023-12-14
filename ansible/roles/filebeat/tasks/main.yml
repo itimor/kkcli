@@ -1,0 +1,28 @@
+---
+- name: import elasticsearch public signing key
+  shell: rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
+
+- name: sync elasticsearch repo file
+  copy:
+    src: elastic7.repo
+    dest: /etc/yum.repos.d
+
+- name: install filebeat 7.x
+  yum:
+    name: filebeat
+    state: present
+
+- name: Enable service filebeta, and not touch the state
+  service:
+    name: filebeat
+    enabled: yes
+
+- name: sync filebeat configure file
+  copy:
+    src: "filebeat-{{ app_env }}.yml"
+    dest: /etc/filebeat/filebeat.yml
+
+- name: Start service filebeat, if not started
+  service:
+    name: filebeat
+    state: started

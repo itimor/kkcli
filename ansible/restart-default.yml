@@ -1,0 +1,14 @@
+---
+- hosts: "{{ app_host }}"
+  gather_facts: no
+  remote_user: root
+  tasks:
+    - name: restart "{{ app_name }}"
+      systemd:
+        name: "{{ app_name }}"
+        daemon_reload: yes
+        state: restarted
+        enabled: yes
+    - name: wait for service to start
+      shell:
+        cmd: sleep 20       

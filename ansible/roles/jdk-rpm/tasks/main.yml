@@ -1,0 +1,9 @@
+---
+- name: put jdk remote server
+  copy: 
+    src: jdk-8u211-linux-x64.rpm
+    dest: /usr/local/src
+- name: install jdk 1.8
+  yum:
+    name: /usr/local/src/jdk-8u211-linux-x64.rpm
+    state: present

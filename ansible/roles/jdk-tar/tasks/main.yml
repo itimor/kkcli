@@ -1,0 +1,17 @@
+---
+- name: put jdk remote server
+  copy: 
+    src: jdk-8u191-linux-x64.tar.gz
+    dest: /usr/local/src
+- name: tar jdk-8u191-linux-x64.tar.gz
+  shell: chdir=/usr/local/src tar zxf jdk-8u191-linux-x64.tar.gz
+- name: mv java
+  shell: mv /usr/local/src/jdk1* /usr/local/
+- name: soft link
+  file: src=/usr/local/jdk1.8.0_191 dest=/usr/local/java  state=link
+- name: put java.sh
+  copy: 
+    src: java.sh
+    dest: /etc/profile.d
+- name: source /etc/profile
+  shell: source /etc/profile

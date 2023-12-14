@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# 部署软件
+
+. ${KKPATH}/lib/util.sh
+
+host=
+service=
+action=install
+
+if [[ $# -eq 0 ]]; then 
+    _usage_service `basename $0` && exit 0
+fi
+
+_parse_arguments "$@"
+
+if test "${action}" == 'install'; then
+    _install_service $service ${host:-local} $env
+fi
+
+if test "${action}" == 'restart'; then
+    _restart_default_project $service ${host:-local} $env
+fi
+
+if test "${action}" == 'list'; then
+    lists=`cat /usr/local/kkcli/ansible/soft.yml |grep -oP '(?<=tags: )\w+'`
+cat << EOF
+    This script is soft install.
+
+    Usage: kkcli soft [OPTIONS] COMMAND [help]
+    $(_red Commands:)
+EOF
+
+    for service in ${lists};do
+        echo "$ kkcli soft --host=app01 --env=dev --service=${service} --action=install"
+    done
+fi

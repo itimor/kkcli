@@ -1,0 +1,35 @@
+---
+- name: copy nginx rpm to remote host
+  copy:
+    src: nginx-1.15.8_el7-1.x86_64.rpm
+    dest: /usr/local/src
+
+- name: install nginx1.15.8
+  yum:
+    name: /usr/local/src/nginx-1.15.8_el7-1.x86_64.rpm
+    state: present
+
+- name: sync nginx.service configure file
+  copy:
+    src: nginx.service
+    dest: /usr/lib/systemd/system/
+
+- name: update nginx pid file dir
+  command:
+    sed -i 's#/usr/local/nginx/run/nginx.pid#/yl/logs/nginx/nginx.pid#' /usr/local/nginx/nginx.conf
+
+- name: create nginx log directory
+  file: path=/yl/logs/nginx state=directory
+
+- name: chown nginx log mode
+  command:
+    chown -R www.www /yl/logs/nginx
+
+- name:  nginx daemon-reload
+  command:
+    systemctl daemon-reload
+    
+- name: restart service nginx
+  service:
+    name: nginx
+    state: restarted

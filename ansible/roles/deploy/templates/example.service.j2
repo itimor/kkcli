@@ -1,0 +1,20 @@
+[Unit]
+Description=yami-shop-platform
+After=network-online.target
+
+[Service]
+WorkingDirectory=/data/app/yami-shop-platform/
+ExecStart=/usr/bin/sh -c '/usr/local/java/bin/java  -Xms512m -Xmx512m -Dfile.encoding=UTF-8  -jar /data/app/yami-shop-platform/yami-shop-platform-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod'
+StandardOutput=journal
+StandardError=inherit
+LimitNOFILE=65536
+TimeoutStopSec=0
+KillSignal=SIGTERM
+SendSIGKILL=no
+SuccessExitStatus=0
+Restart=always
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

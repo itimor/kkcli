@@ -1,0 +1,17 @@
+---
+- name: remove old docker
+  yum:
+    name: docker,docker-common,docker-selinux,docker-engine
+    state: removed
+- name: install docker repo
+  shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+- name: Install docker by yum
+  yum:
+    name: docker-ce
+    state: present
+- name: startup docker
+  systemd:
+    name: docker
+    daemon_reload: yes
+    state: started
+    enabled: yes

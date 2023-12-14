@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# front
+
+set -e
+
+. ${KKPATH}/lib/util.sh
+
+project=
+host=
+version=
+from=
+env=
+action=
+
+if [[ $# -eq 0 ]]; then 
+    _usage_module && exit 1
+fi
+
+_parse_arguments "$@"
+
+if test "$action" = "deploy"; then
+
+    if [[ -z ${from} ]]; then _red "please input dist absolute path" && exit 1;fi
+    if [[ -z ${version} ]]; then _red "please input deploy tag or commit" && exit 1;fi
+    if [[ -z ${env} ]]; then _red "please input deploy environment" && exit 1;fi 
+    
+    _deploy_node_project ${project} ${version} ${host:-local} ${from} ${env}
+
+fi
+
+if test "$action" = "rollback"; then
+    
+    if [[ -z ${env} ]]; then _red "please input deploy environment" && exit 1;fi
+
+    _rollback_default_project ${project} ${host:-local} ${env}
+fi
+ 

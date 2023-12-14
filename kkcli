@@ -1,0 +1,40 @@
+#!/bin/bash
+
+set -e
+
+[ -L $0 ] && pushd `readlink $0 | xargs dirname` > /dev/null || pushd `dirname $0` /dev/null
+export KKPATH=`pwd -P`
+popd > /dev/null
+
+. ${KKPATH}/lib/util.sh
+
+_confirm() {
+    read -r -p "${1:-Are you sure? [y/N]}" response
+    case $response in
+        yes | y ) true;;
+        * ) false;;
+    esac
+}
+
+_update_kkcli(){
+    chmod 755 ${KKPATH}/install 2>/dev/null
+    INSTALL_DIR=${KKPATH} ${KKPATH}/install
+}
+
+_uninstall_kkcli(){
+    _confirm "Do you want to uninstall kkcli? [y/n]: " \
+        && sudo rm -rf ${KKPATH} 2>/dev/null \
+        && sudo rm -f "/sbin/kkcli" 2>/dev/null \
+        && echo "Done !"
+}
+
+case $1 in
+    '' ) _usage && exit 0;;
+    --update ) _update_kkcli && exit 0;;
+    --uninstall ) _uninstall_kkcli && exit 0;;
+    --help ) _usage && exit 0;;
+esac
+
+COMMAND=$1; shift;
+[ ! -f ${KKPATH}/plugins/${COMMAND} ] && _usage
+${KKPATH}/plugins/${COMMAND} "$@"

@@ -1,0 +1,14 @@
+---
+- hosts: "{{ app_host }}"
+  remote_user: root
+  gather_facts: no
+  vars: 
+    app_env: "{{ app_env }}"
+  roles:
+    - { role: jdk-tar, tags: jdk }
+    - { role: filebeat, tags: filebeat}
+    - { role: nginx-tar, tags: nginx }
+    - { role: docker, tags: docker }
+    - { role: zabbix, tags: zabbix }
+    - { role: dns, tags: dns }
+    - { role: skywalking-agent, tags: skywalking }

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# 发布、重启、回滚
+
+. ${KKPATH}/lib/util.sh
+
+_usage() {
+    cat << __EOF__
+This script container deploy,restart,rollback application
+
+Usage: kkcli app [OPTIONS] COMMAND [help]
+  $(_red Commands:)
+__EOF__
+
+    for i in ${KKPATH}/module/*;do
+        [ ! -L "$i" -a -f "$i" ] && echo "      ${i##*/}"
+    done
+
+    [ "${COMMAND}" == "help" ] && exit 0 || exit 1
+}
+
+case $1 in
+    '' ) _usage && exit 2;;
+    -h|--help ) _usage && exit 2;;
+esac
+
+COMMAND=$1; shift;
+[ ! -f ${KKPATH}/module/${COMMAND} ] && _red "The file does not exist" && exit 1
+${KKPATH}/module/${COMMAND} "$@"
