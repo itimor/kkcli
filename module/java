@@ -23,6 +23,11 @@ if test "$action" = "restart"; then
     sleep 10
 fi
 
+if test "$action" = "stop"; then
+    _stop_default_project ${project} ${host:-local} ${env}
+    sleep 10
+fi
+
 if test "$action" = "deploy"; then
 
     if [[ -z ${project} ]]; then _red "please input ${project}.jar project name" && exit 1;fi

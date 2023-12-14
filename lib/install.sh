@@ -21,6 +21,17 @@ _restart_default_project() {
                      -e "app_name=${project_name} app_host=${project_host}"
 }
 
+############ Stop ############
+_stop_default_project() {
+
+    local project_name=$1
+    local project_host=$2
+    local project_env=$3
+
+    ansible-playbook -i ${KKPATH}/inventory/hosts-${project_env} ${KKPATH}/ansible/stop-default.yml -v \
+                     -e "app_name=${project_name} app_host=${project_host}"
+}
+
 ############ Rollback ############
 _rollback_default_project() {
     local project_name=$1

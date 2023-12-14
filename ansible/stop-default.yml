@@ -1,0 +1,11 @@
+---
+- hosts: "{{ app_host }}"
+  gather_facts: no
+  remote_user: root
+  tasks:
+    - name: stop "{{ app_name }}"
+      systemd:
+        name: "{{ app_name }}"
+        daemon_reload: yes
+        state: stopped
+        enabled: yes 
