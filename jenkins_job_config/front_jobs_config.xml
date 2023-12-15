@@ -22,7 +22,6 @@
           <choices class="java.util.Arrays$Arraoptist">
             <a class="string-array">
               <string>deploy</string>
-              <string>restart</string>
               <string>rollback</string>
             </a>
           </choices>

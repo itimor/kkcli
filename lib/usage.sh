@@ -11,7 +11,7 @@ $(_red Options):
      --from              specify jar package abspath
      --env               specify environment
      --version           specify version
-     --action            deploy|rollback|restart
+     --action            deploy|rollback|restart|stop
      -h,--help           lists all command help information
 
 $(_red Example:)
@@ -27,6 +27,9 @@ $(_red Example:)
 
     $(_blue Restart local project.)
      $ kkcli app java --project=project --env=dev --host=app01 --action=restart
+
+    $(_blue Stop local project.)
+     $ kkcli app java --project=project --env=dev --host=app01 --action=stop
 __EOF__
 }
 

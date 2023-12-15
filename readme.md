@@ -4,6 +4,7 @@
 - 发布
 - 重启
 - 回滚
+- 停止
 - 安装软件
 - 同步配置
 
@@ -13,6 +14,7 @@
 │   ├── deploy-java.yml             # 部署java服务的playbook
 │   ├── deploy-node.yml             # 部署front服务的playbook
 │   ├── restart-default.yml         # 重启脚本
+│   ├── stop-default.yml            # 停止脚本
 │   ├── roles                       # 发布playbook和软件安装playbook
 │   ├── rollback-default.yml        # 回滚脚本
 │   ├── services.yml                # 服务启动文件分发
@@ -22,9 +24,8 @@
 ├── inventory                       # host管理；后缀区分环境
 │   ├── hosts-all
 │   ├── hosts-dev
-│   ├── hosts-prd
-│   └── hosts-test
-├── jenkins                         # Jenkins的jobs配置
+│   ├── hosts-prod
+├── jenkins_job_config              # Jenkins的jobs配置
 │   ├── front_jobs_confi.xml
 │   └── java_jobs_config.xml
 ├── kkcli                           # 核心命令
@@ -57,7 +58,7 @@ Some useful kkcli app java|front command args
      --from              specify jar package abspath
      --env               specify environment
      --version           specify version
-     --action            deploy|rollback|restart
+     --action            deploy|rollback|restart|stop
      -h,--help           lists all command help information
 
  Example: 
@@ -73,6 +74,9 @@ Some useful kkcli app java|front command args
 
      Restart local project. 
      $ kkcli app java --project=project --env=dev --host=app01 --action=restart
+
+     Stop local project. 
+     $ kkcli app java --project=project --env=dev --host=app01 --action=stop
 ```
 
 ### soft|软件
