@@ -17,7 +17,7 @@ install_from_git(){
              echo >&2 "Failed to fetch changes => ${GIT_URL}"
              exit 1
          }
-         command git --git-dir="${INSTALL_DIR}/.git" --work-tree="${INSTALL_DIR}" reset --hard origin/master || {
+         command git --git-dir="${INSTALL_DIR}/.git" --work-tree="${INSTALL_DIR}" reset --hard origin/main || {
              echo >&2 "Failed to reset changes => ${GIT_URL}"
              exit 1
          }
