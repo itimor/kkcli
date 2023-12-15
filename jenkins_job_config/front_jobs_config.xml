@@ -1,147 +1,7 @@
-<?xml version="1.1" encoding="UTF-8" standalone="no"?><project>
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
   <actions/>
-  <description/>
-  <keepDependencies>false</keepDependencies>
-  <properties>
-    <jenkins.model.BuildDiscarderProperty>
-      <strategy class="hudson.tasks.LogRotator">
-        <daysToKeep>-1</daysToKeep>
-        <numToKeep>3</numToKeep>
-        <artifactDaysToKeep>-1</artifactDaysToKeep>
-        <artifactNumToKeep>-1</artifactNumToKeep>
-      </strategy>
-    </jenkins.model.BuildDiscarderProperty>
-    <com.sonyericsson.rebuild.RebuildSettings plugin="rebuild@1.32">
-      <autoRebuild>false</autoRebuild>
-      <rebuildDisabled>false</rebuildDisabled>
-    </com.sonyericsson.rebuild.RebuildSettings>
-    <hudson.model.ParametersDefinitionProperty>
-      <parameterDefinitions>
-        <hudson.model.ChoiceParameterDefinition>
-          <name>action</name>
-          <choices class="java.util.Arrays$Arraoptist">
-            <a class="string-array">
-              <string>deploy</string>
-              <string>rollback</string>
-            </a>
-          </choices>
-        </hudson.model.ChoiceParameterDefinition>
-        <net.uaznia.lukanus.hudson.plugins.gitparameter.GitParameterDefinition plugin="git-parameter@0.9.13">
-          <name>branch</name>
-          <uuid>5d579d1b-78f8-4646-9a43-817473ef4878</uuid>
-          <type>PT_BRANCH</type>
-          <branch/>
-          <tagFilter>*</tagFilter>
-          <branchFilter>.*</branchFilter>
-          <sortMode>NONE</sortMode>
-          <defaultValue>origin/feature/hospital</defaultValue>
-          <selectedValue>NONE</selectedValue>
-          <quickFilterEnabled>false</quickFilterEnabled>
-          <listSize>5</listSize>
-        </net.uaznia.lukanus.hudson.plugins.gitparameter.GitParameterDefinition>
-      </parameterDefinitions>
-    </hudson.model.ParametersDefinitionProperty>
-    
-  </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@4.7.1">
-    <configVersion>2</configVersion>
-    <userRemoteConfigs>
-      <hudson.plugins.git.UserRemoteConfig>
-        <url>http://git.opt.local/service/yiling-platform.git</url>
-        <credentialsId>866a0677-fee5-4ede-8a6e-487354b07531</credentialsId>
-      </hudson.plugins.git.UserRemoteConfig>
-    </userRemoteConfigs>
-    <branches>
-      <hudson.plugins.git.BranchSpec>
-        <name>$branch</name>
-      </hudson.plugins.git.BranchSpec>
-    </branches>
-    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
-    <submoduleCfg class="empty-list"/>
-    <extensions/>
-  </scm>
-  <canRoam>true</canRoam>
-  <disabled>false</disabled>
-  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
-  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <triggers/>
-  <concurrentBuild>false</concurrentBuild>
-  <builders>
-    <hudson.tasks.Shell>
-      <command>. /usr/local/kkcli/lib/color.sh
-colo_r purple "载入color脚本"
-host='app01'
-ports='7009 17009'
-env=`echo $JOB_NAME|awk -F/ '{print $1}'`
-app=`echo $JOB_NAME|awk -F/ '{print $2}'|awk -F'-provider' '{print $1}'`
-project=${app}-provider
-src_dir=yiling-service-group/${app}-service
-code_dir=$WORKSPACE/$src_dir/$project
-version=`git rev-parse --short HEAD`"-"`date +%F-%H-%M`
-
-if [[ $action == 'deploy' ]];then
-  ## 打包
-  colo_r purple "开始打包"
-  cd $WORKSPACE/$src_dir
-  /opt/app/maven381/bin/mvn clean deploy -pl com.yiling:$project -am -Dmaven.test.skip=true  
-  from=`ls $code_dir/target/*.jar`
-  if [ ! -f "${from}" ]; then
-   colo_r red "jar 打包失败" 
-   exit 1
-  fi
-  ## 发布
-  colo_r purple "开始发布"
-  kkcli app java --project=$project --host=$host --env=$env --from=$from --version=$version \
-  --action=$action
-else
-  ## 回滚或重启
-  colo_r purple "开始$action"
-  kkcli app java --project=$project --host=$host --env=$env --action=$action
-fi
-
-
-## 检查服务端口
-colo_r purple "检查服务端口"
-port_status=0
-for port in `echo $ports`;do 
-  n=`sudo ansible -b -i /usr/local/kkcli/inventory/hosts-${env} ${host} -m shell -a "netstat -tpnl"|grep -w ${port}| wc -l`
-  echo $n
-  if [ $n -lt 1 ]; then
-     port_status=1
-     colo_r red "$port不在，服务器启动失败"
-  else
-     port_status=0
-  fi 
-done
-
-## 检查服务状态
-colo_r purple "检查服务状态"
-service_status=0
-sudo ansible -b -i /usr/local/kkcli/inventory/hosts-${env} ${host} -m shell -a "systemctl status ${project}" | grep rc=0 || service_status=1
-
-if [[ ($port_status -eq 0) &amp;&amp; ($service_status -eq 0) ]]; then
-   colo_r green "服务器启动成功"
-   sudo ansible -b -i /usr/local/kkcli/inventory/hosts-${env} ${host} -m shell -a "systemctl status ${project}"   
-else
-   colo_r red "服务器启动失败"
-   sudo ansible -b -i /usr/local/kkcli/inventory/hosts-${env} ${host} -m shell -a "journalctl -n 500 -u $project |egrep -m 1 -A30 'ERROR'"
-   exit 1
-fi</command>
-      <configuredLocalRules/>
-    </hudson.tasks.Shell>
-  </builders>
-  <publishers/>
-  <buildWrappers>
-    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.13"/>
-    <hudson.plugins.ansicolor.AnsiColorBuildWrapper plugin="ansicolor@1.0.0">
-      <colorMapName>xterm</colorMapName>
-    </hudson.plugins.ansicolor.AnsiColorBuildWrapper>
-  </buildWrappers>
-</project>[root@optyyB2B003]─[/opt/data/jenkins/jobs/dev/jobs]
-[Pass]─# cat yiling-web-manage/config.xml 
-<?xml version="1.1" encoding="UTF-8" standalone="no"?><project>
-  <actions/>
-  <description/>
+  <description></description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <jenkins.model.BuildDiscarderProperty>
@@ -152,49 +12,40 @@ fi</command>
         <artifactNumToKeep>-1</artifactNumToKeep>
       </strategy>
     </jenkins.model.BuildDiscarderProperty>
-    <com.sonyericsson.rebuild.RebuildSettings plugin="rebuild@1.32">
-      <autoRebuild>false</autoRebuild>
-      <rebuildDisabled>false</rebuildDisabled>
-    </com.sonyericsson.rebuild.RebuildSettings>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
-        <hudson.model.BooleanParameterDefinition>
-          <name>npm_install</name>
-          <description>是否执行npm install</description>
-          <defaultValue>false</defaultValue>
-        </hudson.model.BooleanParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>action</name>
-          <choices class="java.util.Arrays$Arraoptist">
+          <choices class="java.util.Arrays$ArrayList">
             <a class="string-array">
               <string>deploy</string>
               <string>rollback</string>
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
-        <net.uaznia.lukanus.hudson.plugins.gitparameter.GitParameterDefinition plugin="git-parameter@0.9.13">
+        <net.uaznia.lukanus.hudson.plugins.gitparameter.GitParameterDefinition plugin="git-parameter@0.9.19">
           <name>branch</name>
-          <uuid>cbc87561-0e93-4f3c-8329-188e80b0f005</uuid>
+          <uuid>0152b5dd-5780-4b3e-829b-1b267c986a24</uuid>
           <type>PT_BRANCH</type>
-          <branch/>
+          <branch></branch>
           <tagFilter>*</tagFilter>
           <branchFilter>.*</branchFilter>
           <sortMode>NONE</sortMode>
-          <defaultValue>origin/develop</defaultValue>
+          <defaultValue>origin/master</defaultValue>
           <selectedValue>NONE</selectedValue>
           <quickFilterEnabled>false</quickFilterEnabled>
           <listSize>5</listSize>
+          <requiredParameter>false</requiredParameter>
         </net.uaznia.lukanus.hudson.plugins.gitparameter.GitParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
-    
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@4.7.1">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@5.2.1">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <url>http://git.opt.local/junchao.ma/yiling-web-manage.git</url>
-        <credentialsId>866a0677-fee5-4ede-8a6e-487354b07531</credentialsId>
+        <url>http://git.mlet.top/shop/shop-admin-platform.git</url>
+        <credentialsId>73981a0d-7cc1-4751-b938-f48164d57783</credentialsId>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
@@ -214,83 +65,43 @@ fi</command>
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>. /usr/local/kkcli/lib/color.sh
-colo_r purple "载入color脚本"
-host='app02'
-env=`echo $JOB_NAME|awk -F/ '{print $1}'`
-project=`echo $JOB_NAME|awk -F/ '{print $2}'`
+      <command>##&quot;载入color脚本&quot;
+. /usr/local/kkcli/lib/color.sh
 
-version=`git rev-parse --short HEAD`"-"`date +%F-%H-%M`
-from=${WORKSPACE}/dist
+host=&apos;16.163.43.163&apos;
+env=&apos;prod&apos;
+version=`git rev-parse --short HEAD`&quot;-&quot;`date +%F-%H-%M`
+project=`echo $JOB_NAME|awk -F_ &apos;{print $2}&apos;`
 
-# 获取当前commit版本，$GIT_COMMIT为jenkins内置变量
-VERSION=${GIT_COMMIT}
-# 获取当前分支，$GIT_BRANCH为jenkins内置变量
-BRANCH=${GIT_BRANCH}
+if [[ $action == &apos;deploy&apos; ]];then
+  ## 打包
+  colo_r purple &quot;开始打包&quot;
+  cd $WORKSPACE
+  npm install
+  npm run build:prod 
+  
 
-_version() {
-colo_r purple "Branch: ${BRANCH}"
-colo_r purple "VERSION: ${VERSION}"
-}
-
-
-_build() {
-if $npm_install;then
-# 删除package-lock.json
-rm -rf ./package-lock.json
-rm -rf ./node_modules
-npm install --unsafe-perm --registry=https://registry.npm.taobao.org
-fi
-if [ $? != 0 ]; then
-  colo_r red "npm install failed"
-  exit 1
-fi  
-npm run build:dev
-if [ $? != 0 ]; then
-  colo_r red "npm build failed"
-  exit 1
-fi  
-}
-
-_deploy() {
-if [ ! -d "${from}" ]; then
-   colo_r red "dist dir not found"
+  from=$WORKSPACE/dist
+  if [ ! -d &quot;${from}&quot; ]; then
+   colo_r red &quot;dist 打包失败 $project&quot; 
    exit 1
-fi
+  fi
+  ## 发布
+  colo_r purple &quot;开始发布 $project&quot;
+  kkcli app front --project=$project --host=$host --env=$env --from=$from --version=$version --action=$action
 
-kkcli app front --project=$project --host=$host --env=$env --from=$from --version=$version --action=$action
-}
-
-_rollback() {
-kkcli app front --project=$project --host=$host --env=$env --action=$action
-}
-
-
-if [[ $action == "deploy" ]]; then
-  _version
-  colo_r purple "开始打包"
-  _build
-  colo_r purple "开始发布"
-  _deploy
 else
-  colo_r purple "开始回滚"
-  _rollback
-fi
-
-
-</command>
+  ## 回滚
+  colo_r purple &quot;开始$action $project&quot;
+  kkcli app java --project=$project --host=$host --env=$env --action=$action
+fi</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
   <buildWrappers>
-    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.13"/>
-    <hudson.plugins.ansicolor.AnsiColorBuildWrapper plugin="ansicolor@1.0.0">
+    <hudson.plugins.ansicolor.AnsiColorBuildWrapper plugin="ansicolor@1.0.4">
       <colorMapName>xterm</colorMapName>
     </hudson.plugins.ansicolor.AnsiColorBuildWrapper>
-    <jenkins.plugins.nodejs.NodeJSBuildWrapper plugin="nodejs@1.4.0">
-      <nodeJSInstallationName>nodejs14</nodeJSInstallationName>
-      <cacheLocationStrategy class="jenkins.plugins.nodejs.cache.DefaultCacheLocationLocator"/>
-    </jenkins.plugins.nodejs.NodeJSBuildWrapper>
   </buildWrappers>
 </project>

@@ -1,54 +1,63 @@
-<?xml version="1.1" encoding="UTF-8" standalone="no"?><project>
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
   <actions/>
-  <description/>
+  <description></description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <jenkins.model.BuildDiscarderProperty>
       <strategy class="hudson.tasks.LogRotator">
         <daysToKeep>-1</daysToKeep>
-        <numToKeep>3</numToKeep>
+        <numToKeep>5</numToKeep>
         <artifactDaysToKeep>-1</artifactDaysToKeep>
         <artifactNumToKeep>-1</artifactNumToKeep>
       </strategy>
     </jenkins.model.BuildDiscarderProperty>
-    <com.sonyericsson.rebuild.RebuildSettings plugin="rebuild@1.32">
-      <autoRebuild>false</autoRebuild>
-      <rebuildDisabled>false</rebuildDisabled>
-    </com.sonyericsson.rebuild.RebuildSettings>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
+        <com.cwctravel.hudson.plugins.extended__choice__parameter.ExtendedChoiceParameterDefinition plugin="extended-choice-parameter@376.v2e02857547b_a_">
+          <name>projects</name>
+          <quoteValue>false</quoteValue>
+          <saveJSONParameterToFile>false</saveJSONParameterToFile>
+          <visibleItemCount>5</visibleItemCount>
+          <type>PT_CHECKBOX</type>
+          <value>yami-shop-api,yami-shop-multishop,yami-shop-platform,yami-shop-operating</value>
+          <defaultValue>yami-shop-api,yami-shop-multishop,yami-shop-platform,yami-shop-operating</defaultValue>
+          <multiSelectDelimiter>,</multiSelectDelimiter>
+          <projectName>prod-shop-java-gaozong</projectName>
+        </com.cwctravel.hudson.plugins.extended__choice__parameter.ExtendedChoiceParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>action</name>
-          <choices class="java.util.Arrays$Arraoptist">
+          <choices class="java.util.Arrays$ArrayList">
             <a class="string-array">
               <string>deploy</string>
               <string>restart</string>
               <string>rollback</string>
+              <string>stop</string>
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
-        <net.uaznia.lukanus.hudson.plugins.gitparameter.GitParameterDefinition plugin="git-parameter@0.9.13">
+        <net.uaznia.lukanus.hudson.plugins.gitparameter.GitParameterDefinition plugin="git-parameter@0.9.19">
           <name>branch</name>
-          <uuid>5d579d1b-78f8-4646-9a43-817473ef4878</uuid>
+          <uuid>c61ba826-f9d0-4944-b12e-f3eaf95d9f2d</uuid>
           <type>PT_BRANCH</type>
-          <branch/>
+          <branch></branch>
           <tagFilter>*</tagFilter>
           <branchFilter>.*</branchFilter>
           <sortMode>NONE</sortMode>
-          <defaultValue>origin/feature/hospital</defaultValue>
-          <selectedValue>NONE</selectedValue>
+          <defaultValue>origin/soapbox</defaultValue>
+          <selectedValue>DEFAULT</selectedValue>
           <quickFilterEnabled>false</quickFilterEnabled>
           <listSize>5</listSize>
+          <requiredParameter>false</requiredParameter>
         </net.uaznia.lukanus.hudson.plugins.gitparameter.GitParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
-    
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@4.7.1">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@5.2.1">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <url>http://git.mlet.top/lemon/storm-brain-x.git</url>
+        <url>http://git.mlet.top/shop/yami-shop-java.git</url>
         <credentialsId>73981a0d-7cc1-4751-b938-f48164d57783</credentialsId>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
@@ -69,72 +78,72 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>. /usr/local/kkcli/lib/color.sh
-colo_r purple "载入color脚本"
-host='app01'
-ports='7009 17009'
-env=`echo $JOB_NAME|awk -F/ '{print $1}'`
-app=`echo $JOB_NAME|awk -F/ '{print $2}'|awk -F'-provider' '{print $1}'`
-project=${app}-provider
-src_dir=yiling-service-group/${app}-service
-code_dir=$WORKSPACE/$src_dir/$project
-version=`git rev-parse --short HEAD`"-"`date +%F-%H-%M`
+      <command>##&quot;载入color脚本&quot;
+. /usr/local/kkcli/lib/color.sh
 
-if [[ $action == 'deploy' ]];then
+host=&apos;16.163.43.163&apos;
+ports=&apos;8112 8113 8114 8118&apos;
+env=&apos;prod&apos;
+version=`git rev-parse --short HEAD`&quot;-&quot;`date +%F-%H-%M`
+
+if [[ $action == &apos;deploy&apos; ]];then
   ## 打包
-  colo_r purple "开始打包"
-  cd $WORKSPACE/$src_dir
-  /opt/app/maven381/bin/mvn clean deploy -pl com.yiling:$project -am -Dmaven.test.skip=true  
-  from=`ls $code_dir/target/*.jar`
-  if [ ! -f "${from}" ]; then
-   colo_r red "jar 打包失败" 
-   exit 1
-  fi
-  ## 发布
-  colo_r purple "开始发布"
-  kkcli app java --project=$project --host=$host --env=$env --from=$from --version=$version \
-  --action=$action
+  colo_r purple &quot;开始打包&quot;
+  cd $WORKSPACE
+  /opt/maven-3.8.4/bin/mvn clean package 
+  
+  for project in `echo $projects|sed &apos;s/,/ /g&apos;`;do
+    from=`ls $WORKSPACE/$project/target/*.jar`
+    if [ ! -f &quot;${from}&quot; ]; then
+     colo_r red &quot;jar 打包失败 $project&quot; 
+     exit 1
+    fi
+    ## 发布
+    colo_r purple &quot;开始发布 $project&quot;
+    kkcli app java --project=$project --host=$host --env=$env --from=$from --version=$version --action=$action
+    
+    ## 检查服务状态
+    colo_r purple &quot;检查服务状态&quot;
+    service_status=0
+    sudo ansible -b -i /usr/local/kkcli/inventory/hosts-${env} ${host} -m shell -a &quot;systemctl status ${project}&quot; | grep rc=0 || service_status=1
+    if [[ $service_status -eq 0 ]]; then
+       colo_r green &quot;服务器启动成功&quot;
+       sudo ansible -b -i /usr/local/kkcli/inventory/hosts-${env} ${host} -m shell -a &quot;systemctl status ${project}&quot;   
+    else
+       colo_r red &quot;服务器启动失败&quot;
+       sudo ansible -b -i /usr/local/kkcli/inventory/hosts-${env} ${host} -m shell -a &quot;journalctl -n 500 -u $project |egrep -m 1 -A30 &apos;ERROR&apos;&quot;
+       exit 1
+	fi
+  done
 else
-  ## 回滚或重启
-  colo_r purple "开始$action"
-  kkcli app java --project=$project --host=$host --env=$env --action=$action
+  ## 回滚、重启、停止
+  for project in `echo $projects`;do
+    colo_r purple &quot;开始$action $project&quot;
+    kkcli app java --project=$project --host=$host --env=$env --action=$action
+  done
 fi
 
 
 ## 检查服务端口
-colo_r purple "检查服务端口"
+colo_r purple &quot;检查服务端口&quot;
 port_status=0
 for port in `echo $ports`;do 
-  n=`sudo ansible -b -i /usr/local/kkcli/inventory/hosts-${env} ${host} -m shell -a "netstat -tpnl"|grep -w ${port}| wc -l`
+  n=`sudo ansible -b -i /usr/local/kkcli/inventory/hosts-${env} ${host} -m shell -a &quot;netstat -tpnl&quot;|grep -w ${port}| wc -l`
   echo $n
   if [ $n -lt 1 ]; then
      port_status=1
-     colo_r red "$port不在，服务器启动失败"
+     colo_r red &quot;$port不在，服务器启动失败&quot;
+     exit -168
   else
      port_status=0
   fi 
-done
-
-## 检查服务状态
-colo_r purple "检查服务状态"
-service_status=0
-sudo ansible -b -i /usr/local/kkcli/inventory/hosts-${env} ${host} -m shell -a "systemctl status ${project}" | grep rc=0 || service_status=1
-
-if [[ ($port_status -eq 0) &amp;&amp; ($service_status -eq 0) ]]; then
-   colo_r green "服务器启动成功"
-   sudo ansible -b -i /usr/local/kkcli/inventory/hosts-${env} ${host} -m shell -a "systemctl status ${project}"   
-else
-   colo_r red "服务器启动失败"
-   sudo ansible -b -i /usr/local/kkcli/inventory/hosts-${env} ${host} -m shell -a "journalctl -n 500 -u $project |egrep -m 1 -A30 'ERROR'"
-   exit 1
-fi</command>
+done</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
   <buildWrappers>
-    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.13"/>
-    <hudson.plugins.ansicolor.AnsiColorBuildWrapper plugin="ansicolor@1.0.0">
+    <hudson.plugins.ansicolor.AnsiColorBuildWrapper plugin="ansicolor@1.0.4">
       <colorMapName>xterm</colorMapName>
     </hudson.plugins.ansicolor.AnsiColorBuildWrapper>
   </buildWrappers>
