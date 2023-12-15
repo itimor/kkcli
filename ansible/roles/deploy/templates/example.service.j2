@@ -4,7 +4,7 @@ After=network-online.target
 
 [Service]
 WorkingDirectory=/opt/app/{{ app_name }}/
-ExecStart=/usr/bin/sh -c '/opt/jdk1.8.0_341/bin/java -Dfile.encoding=UTF-8 -jar /opt/app/{{ app_name }}/current/{{ app_jar_name }} --spring.profiles.active={{ app_env }}'
+ExecStart=/usr/bin/sh -c '/opt/jdk1.8.0_341/bin/java -Dfile.encoding=UTF-8 -jar /opt/app/{{ app_name }}/current/{{ app_jar_name }} --spring.profiles.active={{ app_env }} >/opt/logs/deploy/{{ app_name }}.out 2>&1'
 StandardOutput=journal
 StandardError=inherit
 LimitNOFILE=65536
