@@ -39,4 +39,4 @@
 
 - name: wait for service to start
   shell:
-    cmd: sleep 30
+    cmd: sleep 15
