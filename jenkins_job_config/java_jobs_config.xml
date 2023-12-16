@@ -23,7 +23,7 @@
           <value>yami-shop-api,yami-shop-multishop,yami-shop-platform,yami-shop-operating</value>
           <defaultValue>yami-shop-api,yami-shop-multishop,yami-shop-platform,yami-shop-operating</defaultValue>
           <multiSelectDelimiter>,</multiSelectDelimiter>
-          <projectName>prod-shop-java-gaozong</projectName>
+          <projectName>prod-java-gaozong-shop</projectName>
         </com.cwctravel.hudson.plugins.extended__choice__parameter.ExtendedChoiceParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>action</name>
@@ -38,13 +38,13 @@
         </hudson.model.ChoiceParameterDefinition>
         <net.uaznia.lukanus.hudson.plugins.gitparameter.GitParameterDefinition plugin="git-parameter@0.9.19">
           <name>branch</name>
-          <uuid>c61ba826-f9d0-4944-b12e-f3eaf95d9f2d</uuid>
+          <uuid>c8a1ce7d-3e6a-4b6e-a388-18b511b0d2a6</uuid>
           <type>PT_BRANCH</type>
           <branch></branch>
           <tagFilter>*</tagFilter>
           <branchFilter>.*</branchFilter>
           <sortMode>NONE</sortMode>
-          <defaultValue>origin/soapbox</defaultValue>
+          <defaultValue>origin/temumal</defaultValue>
           <selectedValue>DEFAULT</selectedValue>
           <quickFilterEnabled>false</quickFilterEnabled>
           <listSize>5</listSize>
@@ -103,27 +103,27 @@ if [[ $action == &apos;deploy&apos; ]];then
     kkcli app java --project=$project --host=$host --env=$env --from=$from --version=$version --action=$action
     
     ## 检查服务状态
-    colo_r purple &quot;检查服务状态&quot;
+    colo_r purple &quot;检查服务状态 $project&quot;
     service_status=0
     sudo ansible -b -i /usr/local/kkcli/inventory/hosts-${env} ${host} -m shell -a &quot;systemctl status ${project}&quot; | grep rc=0 || service_status=1
     if [[ $service_status -eq 0 ]]; then
-       colo_r green &quot;服务器启动成功&quot;
+       colo_r green &quot;服务器启动成功 $project&quot;
        sudo ansible -b -i /usr/local/kkcli/inventory/hosts-${env} ${host} -m shell -a &quot;systemctl status ${project}&quot;   
     else
-       colo_r red &quot;服务器启动失败&quot;
+       colo_r red &quot;服务器启动失败 $project&quot;
        sudo ansible -b -i /usr/local/kkcli/inventory/hosts-${env} ${host} -m shell -a &quot;journalctl -n 500 -u $project |egrep -m 1 -A30 &apos;ERROR&apos;&quot;
        exit 1
 	fi
   done
 else
   ## 回滚、重启、停止
-  for project in `echo $projects`;do
+  for project in `echo $projects|sed &apos;s/,/ /g&apos;`;do
     colo_r purple &quot;开始$action $project&quot;
     kkcli app java --project=$project --host=$host --env=$env --action=$action
   done
 fi
 
-
+sleep 10
 ## 检查服务端口
 colo_r purple &quot;检查服务端口&quot;
 port_status=0

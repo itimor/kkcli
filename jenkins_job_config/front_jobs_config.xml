@@ -25,14 +25,14 @@
         </hudson.model.ChoiceParameterDefinition>
         <net.uaznia.lukanus.hudson.plugins.gitparameter.GitParameterDefinition plugin="git-parameter@0.9.19">
           <name>branch</name>
-          <uuid>0152b5dd-5780-4b3e-829b-1b267c986a24</uuid>
+          <uuid>a979569b-8f6d-4abf-ac72-650cb642312f</uuid>
           <type>PT_BRANCH</type>
           <branch></branch>
           <tagFilter>*</tagFilter>
           <branchFilter>.*</branchFilter>
           <sortMode>NONE</sortMode>
-          <defaultValue>origin/master</defaultValue>
-          <selectedValue>NONE</selectedValue>
+          <defaultValue>origin/prod_temumall</defaultValue>
+          <selectedValue>DEFAULT</selectedValue>
           <quickFilterEnabled>false</quickFilterEnabled>
           <listSize>5</listSize>
           <requiredParameter>false</requiredParameter>
